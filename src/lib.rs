@@ -1,9 +1,10 @@
+use std::io::Read;
 use eframe::{
     egui::{self, Context, Ui},
     Frame,
 };
 
-const HASH_FIELD_WIDTH: f32 = 440.0;
+const HASH_FIELD_WIDTH: f32 = 480.0;
 const LABEL_TO_INPUT_SPACE: f32 = 10.0;
 const LABEL_TEXT_SIZE: f32 = 16.0;
 
@@ -24,6 +25,25 @@ impl Default for HashApp {
         }
     }
 }
+impl HashApp {
+    fn calculate_hashes(&mut self) {
+        let mut file = std::fs::File::open(&self.picked_file)
+            .expect("Couldn't open the file");
+        let mut buffer: Vec<u8> = Vec::new();
+        file.read(&mut buffer).expect("Couldn't read the data");
+
+        let md5_digest = md5::compute(&buffer);
+        self.md5_hash = format!("{:x}", md5_digest);
+
+        let sha256_digest = sha256::digest_bytes(&buffer);
+        self.sha256_hash = sha256_digest;
+
+        let mut sha1_hasher = sha1_smol::Sha1::new();
+        sha1_hasher.update(&buffer);
+        self.sha1_hash = sha1_hasher.digest().to_string();
+    }
+}
+
 // TODO: Eliminate all hardcoded values and see if sizes are consistent across different machines
 impl eframe::App for HashApp {
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
@@ -40,6 +60,7 @@ impl eframe::App for HashApp {
                 if ui.button("Open file").clicked() {
                     if let Some(path) = rfd::FileDialog::new().pick_file() {
                         self.picked_file = path.display().to_string();
+                        self.calculate_hashes();
                     }
                 }
             });
@@ -52,7 +73,6 @@ impl eframe::App for HashApp {
                 ui.add_space(LABEL_TO_INPUT_SPACE + 18.0);
                 ui.add_sized([HASH_FIELD_WIDTH, 20.0],
                              egui::TextEdit::singleline(&mut self.md5_hash)
-                                 .interactive(false)
                 );
             });
             ui.add_space(20f32);
@@ -63,7 +83,6 @@ impl eframe::App for HashApp {
                 ui.add_space(LABEL_TO_INPUT_SPACE + 15.0);
                 ui.add_sized([HASH_FIELD_WIDTH, 20.0],
                              egui::TextEdit::singleline(&mut self.sha1_hash)
-                                 .interactive(false)
                 );
             });
             ui.add_space(20f32);
@@ -74,7 +93,6 @@ impl eframe::App for HashApp {
                 ui.add_space(LABEL_TO_INPUT_SPACE);
                 ui.add_sized([HASH_FIELD_WIDTH, 20.0],
                              egui::TextEdit::singleline(&mut self.sha256_hash)
-                                 .interactive(false)
                 );
             });
         });

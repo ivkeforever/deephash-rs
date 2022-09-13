@@ -6,7 +6,7 @@ use file_hasher_rs::HashApp;
 fn main() {
     let options = eframe::NativeOptions {
         drag_and_drop_support: true,
-        initial_window_size: Some(egui::Vec2::new(540.0, 320.0)),
+        initial_window_size: Some(egui::Vec2::new(580.0, 320.0)),
         resizable: false,
         ..Default::default()
     };

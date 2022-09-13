@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 eframe = "0.19.0"
 rfd = "0.10.0"
+md5 = "0.7.0"
+sha1_smol = "1.0.0"
+sha256 = "1.0.3"
