@@ -44,6 +44,22 @@ impl HashApp {
     }
 }
 
+fn preview_drop_file_on_hover(ctx: &Context) {
+    use egui::*;
+    use std::fmt::Write;
+
+    let mut file_path = String::new();
+
+    if !ctx.input().raw.hovered_files.is_empty() {
+        let file = &ctx.input().raw.hovered_files[0];
+        if let Some(path) = &file.path {
+            write!(file_path, "{}", path.display()).ok();
+        }
+
+        println!("{}", file_path);
+    }
+}
+
 // TODO: Eliminate all hardcoded values and see if sizes are consistent across different machines
 impl eframe::App for HashApp {
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
@@ -96,5 +112,7 @@ impl eframe::App for HashApp {
                 );
             });
         });
+
+        preview_drop_file_on_hover(&ctx);
     }
 }
