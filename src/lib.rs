@@ -48,15 +48,20 @@ fn preview_drop_file_on_hover(ctx: &Context) {
     use egui::*;
     use std::fmt::Write;
 
-    let mut file_path = String::new();
-
     if !ctx.input().raw.hovered_files.is_empty() {
-        let file = &ctx.input().raw.hovered_files[0];
-        if let Some(path) = &file.path {
-            write!(file_path, "{}", path.display()).ok();
+        let mut file_path = String::new();
+
+       for file in &ctx.input().raw.hovered_files {
+            if let Some(path) = &file.path {
+                write!(file_path, "{}", path.display()).ok();
+            }
         }
 
-        println!("{}", file_path);
+        let painter =
+            ctx.layer_painter(LayerId::new(Order::Foreground, Id::new("file_drop_target")));
+
+        let screen_rect = ctx.input().screen_rect();
+        painter.rect_filled(screen_rect, 0.0, Color32::from_black_alpha(192));
     }
 }
 
@@ -111,8 +116,9 @@ impl eframe::App for HashApp {
                              egui::TextEdit::singleline(&mut self.sha256_hash)
                 );
             });
+
+            preview_drop_file_on_hover(ctx);
         });
 
-        preview_drop_file_on_hover(&ctx);
     }
 }
